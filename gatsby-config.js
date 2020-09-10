@@ -1,53 +1,96 @@
 require(`dotenv`).config({
   path: `.env`,
-})
+});
 
-const shouldAnalyseBundle = process.env.ANALYSE_BUNDLE
+const newsletterFeed = require(`./src/utils/newsletterFeed`);
+const themeOptions = require("./options");
+const shouldAnalyseBundle = process.env.ANALYSE_BUNDLE;
+
+const { mdx = true, feed, feedTitle, postsPath, pagesPath } = themeOptions;
 
 module.exports = {
   siteMetadata: {
-    siteTitleAlt: `Minimal Blog - Gatsby Theme`,
+    siteTitleAlt: `Ayhan Sipahi - Web Log`,
+    siteTitle: `Ayhan Sipahi`,
+    siteHeadline: `Minimal Blog`,
+    siteUrl: `https://ayhan.dev`,
+    siteDescription: ``,
+    siteLanguage: `en`,
+    siteImage: `/banner.jpg`,
+    author: `@ayhansipahi`,
   },
   plugins: [
     {
-      resolve: `@lekoarts/gatsby-theme-minimal-blog`,
-      // See the theme's README for all available options
+      resolve: `gatsby-source-filesystem`,
       options: {
-        navigation: [
+        name: postsPath,
+        path: postsPath,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: pagesPath,
+        path: pagesPath,
+      },
+    },
+    mdx && {
+      resolve: `gatsby-plugin-mdx`,
+      options: {
+        extensions: [`.mdx`, `.md`],
+        gatsbyRemarkPlugins: [
           {
-            title: `Blog`,
-            slug: `/blog`,
-          },
-          {
-            title: `About`,
-            slug: `/about`,
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 960,
+              quality: 90,
+              linkImagesToOriginal: false,
+            },
           },
         ],
-        externalLinks: [
+        plugins: [
           {
-            name: `Twitter`,
-            url: `https://twitter.com/lekoarts_de`,
-          },
-          {
-            name: `Instagram`,
-            url: `https://www.instagram.com/lekoarts.de/`,
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 960,
+              quality: 90,
+              linkImagesToOriginal: false,
+            },
           },
         ],
       },
     },
+    `gatsby-transformer-sharp`,
+    `gatsby-plugin-sharp`,
+    `gatsby-plugin-typescript`,
+    feed && {
+      resolve: `gatsby-plugin-feed`,
+      options: newsletterFeed(feedTitle),
+    },
+    `gatsby-plugin-react-helmet`,
+    `gatsby-plugin-typescript`,
+    `gatsby-plugin-catch-links`,
+    `gatsby-plugin-theme-ui`,
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        trackingId: process.env.GOOGLE_ANALYTICS_ID,
+        trackingId: "UA-29517280-5",
+      },
+    },
+    {
+      resolve: `gatsby-plugin-canonical-urls`,
+      options: {
+        siteUrl: `https://ayhan.dev`,
+        stripQueryString: true,
       },
     },
     `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `minimal-blog - @lekoarts/gatsby-theme-minimal-blog`,
-        short_name: `minimal-blog`,
-        description: `Typography driven, feature-rich blogging theme with minimal aesthetics. Includes tags/categories support and extensive features for code blocks such as live preview, line numbers, and code highlighting.`,
+        name: `Ayhan Sipahi - Blog`,
+        short_name: `Ayhan Sipahi`,
+        description: ``,
         start_url: `/`,
         background_color: `#fff`,
         theme_color: `#6B46C1`,
@@ -77,4 +120,4 @@ module.exports = {
       },
     },
   ].filter(Boolean),
-}
+};
